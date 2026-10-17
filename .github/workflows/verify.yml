@@ -13,8 +13,20 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-    - name: Run total TM
+    - name: Verify designated QTM core
       run: |
-        chmod +x CosmicLove_TotalTM_AutoDeploy_2KB.sh
+        test "$(wc -l < lfp_atgc_tm_2kb.sh)" -eq 1
+        test "$(wc -c < lfp_atgc_tm_2kb.sh)" -lt 2048
+        sh -n lfp_atgc_tm_2kb.sh
+        sh lfp_atgc_tm_2kb.sh > /tmp/qtm42.json
+        python3 - <<'PY'
+        import json
+        x=json.load(open('/tmp/qtm42.json'))
+        assert x['protocol']=='HSI-COSMIC-QUANTUM-SELF-CLOSURE/QTM-1.0'
+        assert x['program']==55067263 and x['measurement']=='none'
+        assert all(x[k] is True for k in ('transition_verified','norm_preserved','U2_identity','two_step_quantum_recurrence'))
+        PY
+    - name: Run deployment wrapper
+      run: |
         sh CosmicLove_TotalTM_AutoDeploy_2KB.sh
-        echo "Total TM fixed point verified."
+        echo "QTM core and deployment wrapper verified."
