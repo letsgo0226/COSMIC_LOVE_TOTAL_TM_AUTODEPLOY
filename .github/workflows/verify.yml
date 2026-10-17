@@ -24,7 +24,8 @@ jobs:
         x=json.load(open('/tmp/qtm42.json'))
         assert x['protocol']=='HSI-COSMIC-QUANTUM-SELF-CLOSURE/QTM-1.0'
         assert x['program']==55067263 and x['measurement']=='none'
-        assert all(x[k] is True for k in ('transition_verified','norm_preserved','U2_identity','two_step_quantum_recurrence'))
+        assert x['decoder_protocol']=='HSI-DYNAMIC-QUANTUM-SELFCODE/2KB-1.2'
+        assert all(x[k] is True for k in ('transition_verified','norm_preserved','U2_identity','two_step_quantum_recurrence','roundtrip','target_match'))
         PY
     - name: Run deployment wrapper
       run: |
